@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { GetRelatorioDto } from 'src/presentations/dto/get-relatorio.dto';
 import { PubSubService } from '../services/pub-sub.service';
+import { Relatorio } from 'src/domain/relatorio.entity';
 
 @Injectable()
 export class RelatorioRepositorySequelize implements IRelatorioRepository {
@@ -15,12 +16,17 @@ export class RelatorioRepositorySequelize implements IRelatorioRepository {
     this.subscribeToRelatorioEvents
   }
 
-  async getRelatorio(relatorio: GetRelatorioDto): Promise<any> {
+  async createRelatorio(relatorio: GetRelatorioDto): Promise<any> {
     const newRelatorio = await this.relatorioModel.create(relatorio);
 
     await this.pubSubService.publishMessage('projects/hackathon-fiap-ponto/topics/new_relatorio', newRelatorio)
 
-    return "test";
+    return "ok";
+  }
+
+  async getAllRelatorios(): Promise<any> {
+    const newRelatorio = await this.relatorioModel.findAll();
+    return newRelatorio;
   }
 
   private decodeBase64(base64String: string): string {

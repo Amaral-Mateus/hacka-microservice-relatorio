@@ -1,7 +1,8 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { RelatorioRepositorySequelize } from '../repositories/relatorio.repository.impl.sequelize';
 import { UseCaseProxy } from './usecase-proxy';
-import { GetRelatorioUseCase } from 'src/application/use-cases/get-report.use-case copy';
+import { GetRelatorioUseCase } from 'src/application/use-cases/get-report.use-case';
+import { CreteRelatorioUseCase} from 'src/application/use-cases/create-report.use-case'
 import { RepositoriesModule } from '../repositories/repositories.module';
 @Module({
   imports: [RepositoriesModule],
@@ -9,6 +10,7 @@ import { RepositoriesModule } from '../repositories/repositories.module';
 export class UsecaseProxyModule {
   //Relatorio
   static GET_RELATORIO_USE_CASE = 'getRelatorioUsecaseProxy';
+  static CREATE_RELATORIO_USE_CASE = 'createRelatorioUseCaseProxy'
 
   static register(): DynamicModule {
     return {
@@ -20,9 +22,17 @@ export class UsecaseProxyModule {
           useFactory: (relatorioRepository: RelatorioRepositorySequelize) =>
             new UseCaseProxy(new GetRelatorioUseCase(relatorioRepository)),
         },
+
+        {
+          inject: [RelatorioRepositorySequelize],
+          provide: UsecaseProxyModule.CREATE_RELATORIO_USE_CASE,
+          useFactory: (relatorioRepository: RelatorioRepositorySequelize) =>
+            new UseCaseProxy(new CreteRelatorioUseCase(relatorioRepository)),
+        },
       ],
       exports: [
-        UsecaseProxyModule.GET_RELATORIO_USE_CASE
+        UsecaseProxyModule.GET_RELATORIO_USE_CASE,
+        UsecaseProxyModule.CREATE_RELATORIO_USE_CASE
       ],
     };
   }
